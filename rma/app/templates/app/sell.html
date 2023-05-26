@@ -1,0 +1,121 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <div class="main_content">
+        <div><h3>SELL</h3></div>  
+        <div class="buttons m-1">
+            <a href="{% url 'create-sell-bill' %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-primary btn-lg btn-block">CREATE NEW BILL</button></a>
+        </div>
+        <div class="m-3 p-2">
+            <div class="row m-2">
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL BILLS</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_bills}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL STOCK SOLD</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_payments}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PROFIT</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_profits}}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row m-2">
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PAID BILLS</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{paid_bills}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PAID STOCK SOLD</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{paid_payments}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PAID PROFIT</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{paid_profits}}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row m-2">
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PENDING BILLS</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{pending_bills}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PENDING STOCK SOLD</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{pending_payments}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PENDING PROFIT</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{pending_profits}}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info m-1">
+            <h2 class="d-flex justify-content-center mb-3">PREVIOUS BILLS</h2>
+            <table class="table">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">BILL NUMBER</th>
+                    <th scope="col">BILL DATE</th>
+                    <th scope="col">SUPPLIER NAME</th>
+                    <th scope="col">BILL AMOUNT</th>
+                    <th scope="col">PAYMENT STATUS</th>
+                    <th scope="col">TOTAL PROFIT</th>
+                    <th scope="col">VIEW DETAILS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for sell_bill in sell_bills %}
+                        <tr>
+                            <td scope="row">{{ sell_bill.sell_bill_pk }}</td>
+                            <td>{{ sell_bill.sell_date }}</td>
+                            <td>{{ sell_bill.supplier }}</td>
+                            <td>{{ sell_bill.total_amount }}</td>
+                            <td>{{ sell_bill.payment_status }}</td>
+                            <td>{{ sell_bill.total_profit }}</td>
+                            <td>
+                                <a href="{% url 'sell-bill-details' sell_bill.sell_bill_pk %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-secondary">View Details</button></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+{% endblock content%}

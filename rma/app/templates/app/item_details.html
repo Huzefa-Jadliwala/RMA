@@ -1,0 +1,60 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <div class="main_content">
+        <div class="row mt-3">
+            <div class="col-md-7 col-sm-12 ">
+                <a href="{% url 'item-master' %}" class="btn btn-primary">Back</a>
+            </div>
+        </div>
+        <h3 class="d-flex justify-content-center m-3">ITEM DETAILS</h3>
+        <table class="table table-bordered my-4">
+
+            <tbody>
+                <tr>
+                    <th>ITEM NAME:</th>
+                    <td>{{item.item_name}}</td>
+                    <th>PACKAGING TYPE:</th>
+                    <td>{{item.item_packaging_type}}</td>
+                    <th>LOW STOCK ALERT:</th>
+                    <td>{{item.item_low_stock_alert}} </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="m-3">
+            <a href="{% url 'update-item' item.item_pk %}" class="btn btn-outline-dark d-flex justify-content-center">Update Product Details</a>
+            <br>
+            <a href="{% url 'delete-item' item.item_pk %}" class="btn btn-outline-danger d-flex justify-content-center">Delete Product</a>
+        </div>
+        <div class="info m-5">
+            <table class="table">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">HSNCODE</th>
+                    <th scope="col">CURRENT STOCK</th>
+                    <th scope="col">PURCHASE PRICE</th>
+                    <th scope="col">SALE PRICE</th>
+                    <th scope="col">TOTAL STOCK VALUE</th>
+                    <th scope="col">OTHER ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for hsncode in item.hsncodes.all %}
+                        <tr>
+                            <td scope="row">{{ hsncode.hsncode_pk }}</td>
+                            <td scope="row">{{ hsncode.in_stock }}</td>
+                            <td scope="row">{{ hsncode.purchase_price }}</td>
+                            <td scope="row">{{ hsncode.sell_price }}</td>
+                            <td scope="row">{{ hsncode.stock_value }}</td>
+                            <td>
+                                <a href="{% url 'update-stock' item.item_pk hsncode.hsncode_pk hsncode.purchase_price %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-secondary">UPDATE</button></a>
+                                <a href="{% url 'delete-stock' item.item_pk hsncode.hsncode_pk hsncode.purchase_price %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-danger">DELETE</button></a>
+                            </td>
+                            
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+{% endblock content%}

@@ -1,0 +1,15 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+  <div class="row mt-3">
+    <div class="col-md-7 col-sm-12 ">
+        <a href="{% url 'item-details' item_pk %}" class="btn btn-primary">Back</a>
+    </div>
+  </div>
+  <h1 class="d-flex justify-content-center m-3">UPDATE PRODUCT DETAILS</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ product_form.as_p }}
+    <button type="submit" class="btn btn-outline-secondary btn-lg btn-block">UPDATE</button>
+  </form>
+{% endblock %}
