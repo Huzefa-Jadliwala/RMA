@@ -615,7 +615,7 @@ class UpdatePurchaseBillView(View):
         item_ids = purchase_bill.purchaseitem_set.values_list('item_id', flat=True)
         print(item_ids)
         for item_id in item_ids:
-            purchase_bill.items.add(item_id)
+            purchase_bill.items.add(item_id.item_pk)
         print(purchase_bill.items)
         purchase_bill_form = PurchaseBillForm(instance=purchase_bill)
         PurchaseItemFormset = inlineformset_factory(PurchaseBill, PurchaseItem, form=PurchaseItemForm, extra=0)
