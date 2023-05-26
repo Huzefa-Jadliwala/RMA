@@ -1,0 +1,60 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <div class="main_content">
+        <div class="row mt-3">
+            <div class="col-md-7 col-sm-12 ">
+                <a href="{% url 'sell' %}" class="btn btn-primary">Back</a>
+            </div>
+        </div>
+        <h3 class="d-flex justify-content-center m-3">BILL DETAILS</h3>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>BILL NO.:</th>
+                        <td>{{sell_bill.sell_bill_pk}}</td>
+                        <th>SUPPLIER:</th>
+                        <td>{{sell_bill.supplier}}</td>
+                        <th>PURCHASE DATE:</th>
+                        <td>{{sell_bill.sell_date}}</td>
+                    </tr>
+                    <tr>
+                        <th>BILL AMOUNT:</th>
+                        <td colspan="2">{{sell_bill.total_amount}}</td>
+                        <th>PAYMENT STATUS:</th>
+                        <td colspan="2">{{sell_bill.payment_status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        <div class="m-3">
+            <br>
+            <a href="{% url 'update-sell-bill' sell_bill.sell_bill_pk %}" class="btn btn-outline-dark d-flex justify-content-center">UPDATE</a>
+            <br>
+            <a href="{% url 'delete-sell-bill' sell_bill.sell_bill_pk %}" class="btn btn-outline-danger d-flex justify-content-center">DELETE</a>
+        </div>
+        <div class="info m-5">
+            <table class="table">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">ITEM</th>
+                    <th scope="col">HSNCODE</th>
+                    <th scope="col">QUANTITY</th>
+                    <th scope="col">Sell PRICE</th>
+                    <th scope="col">PROFIT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for bill_item in bill_items %}
+                        <tr>
+                            <td scope="row">{{ bill_item.item }}</td>
+                            <td scope="row">{{ bill_item.hsncode }}</td>
+                            <td scope="row">{{ bill_item.quantity }}</td>
+                            <td scope="row">{{ bill_item.sprice }}</td>
+                            <td scope="row">{{ bill_item.profit }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+{% endblock content%}

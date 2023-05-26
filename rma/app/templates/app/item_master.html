@@ -1,0 +1,65 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <div class="main_content">
+        <div class="justify-content-center"><h3>ITEM MASTER</h3></div>  
+        <div class="buttons m-3">
+            <a href="{% url 'create-item' %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-primary btn-lg btn-block">CREATE NEW ITEM</button></a>
+            <a href="{% url 'add-stock' %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-primary btn-lg btn-block">ADD NEW STOCK</button></a>
+        </div>
+        <div class="m-3 p-2">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PURCHASE STOCK VALUE</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_purchase_value}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL SALE STOCK VALUE</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_sell_value}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL EXPECTED PROFIT</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_profit}}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info m-3">
+            <table class="table">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">PRODUCT NAME</th>
+                    <th scope="col">PACKAGING TYPE</th>
+                    <th scope="col">CURRENT STOCKS</th>
+                    <th scope="col">STOCK VALUE</th>
+                    <th scope="col">UPDATE DETAILS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for item in item_data %}
+                        <tr>
+                            <td scope="row">{{ item.item_name }}</td>
+                            <td>{{ item.item_packaging_type }}</td>
+                            <td>{{ item.stock_in }}</td>
+                            <td>{{ item.stock_value }}</td>
+                            <td>
+                                <a href="{% url 'item-details' item.item_pk %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-secondary">View Details</button></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+{% endblock content%}

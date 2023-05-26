@@ -1,0 +1,94 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <div class="main_content">
+        <div class="justify-content-center"><h3>PURCHASE</h3></div>  
+        <div class="buttons m-1">
+            <a href="{% url 'create-purchase-bill' %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-primary btn-lg btn-block">CREATE NEW BILL</button></a>
+        </div>
+        <div class="m-1 p-2">
+            <div class="row m-2">
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL BILLS</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_bills}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PURCHASE STOCK VALUE</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_payments}}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row m-2">
+                <div class="col-sm-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">PAID BILLS</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{paid_bills}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">PENDING BILLS</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{pending_bills}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">PAID PURCHASE STOCK VALUE</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{paid_payments}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">PENDING PURCHASE STOCK VALUE</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{pending_payments}}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info m-3">
+            <h2 class="d-flex justify-content-center mb-3">PREVIOUS BILLS</h2>
+            <table class="table">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">BILL NUMBER</th>
+                    <th scope="col">BILL DATE</th>
+                    <th scope="col">SUPPLIER NAME</th>
+                    <th scope="col">BILL AMOUNT</th>
+                    <th scope="col">PAYMENT STATUS</th>
+                    <th scope="col">VIEW DETAILS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for purchase_bills in purchase_bills %}
+                        <tr>
+                            <td scope="row">{{ purchase_bills.purchase_bill_pk }}</td>
+                            <td>{{ purchase_bills.purchase_date }}</td>
+                            <td>{{ purchase_bills.supplier }}</td>
+                            <td>{{ purchase_bills.total_amount }}</td>
+                            <td>{{ purchase_bills.payment_status }}</td>
+
+                            <td>
+                                <a href="{% url 'purchase-bill-details' purchase_bills.purchase_bill_pk %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-secondary">View Details</button></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+{% endblock content%}

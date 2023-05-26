@@ -1,0 +1,118 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="main_content">
+        <div class="header"><h3>Dashboard</h3></div>  
+        <div class="info">
+            <div class="m-3 p-2">
+                <div class="row m-2">
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title d-flex justify-content-center">TODAY'S PURCHASE</h6>
+                                <h1 class="card-text d-flex justify-content-center">{{daily_total_purchase}}</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title d-flex justify-content-center">TODAY'S SELL</h6>
+                                <h1 class="card-text d-flex justify-content-center">{{daily_total_sell}}</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title d-flex justify-content-center">TODAY'S PROFIT</h6>
+                                <h1 class="card-text d-flex justify-content-center">{{daily_total_profit}}</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row m-2">
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title d-flex justify-content-center">OVERALL PURCHASE</h6>
+                                <h1 class="card-text d-flex justify-content-center">{{total_purchase}}</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title d-flex justify-content-center">OVERALL SELL</h6>
+                                <h1 class="card-text d-flex justify-content-center">{{total_sell}}</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title d-flex justify-content-center">OVERALL PROFIT</h6>
+                                <h1 class="card-text d-flex justify-content-center">{{total_profit}}</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row m-2">
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL SALE STOCK VALUE</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_sell_value}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL PURCHASE STOCK VALUE</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_purchase_value}}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title d-flex justify-content-center">TOTAL EXPECTED PROFIT</h6>
+                            <h1 class="card-text d-flex justify-content-center">{{total_profit_value}}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="row m-5">
+            <div class="p-4 border col-sm-8">
+                <h3 class="d-flex justify-content-center">PURCHASE/SELL OF THE MONTH</h3>
+                <br>
+                <canvas id="myChart" width="350" height="150"></canvas>
+            </div>
+            <div class="p-4 border col-sm-4">
+                <h3 class="d-flex justify-content-center">MOST SOLD ITEMS</h3>
+                <canvas id="pieChart" width="150" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+    <script type="text/javascript">
+        $.get('{% url "line_chart_json" %}', function(data) {
+            var ctx = $("#myChart").get(0).getContext("2d");
+            new Chart(ctx, {
+                type: 'line', data: data
+            });
+        });
+        $.get('{% url "pie_chart_json" %}', function(data) {
+            var ctx = $("#pieChart").get(0).getContext("2d");
+            new Chart(ctx, {
+                type: 'pie',
+                data: data
+            });
+        });
+        </script>
+{% endblock content%}
