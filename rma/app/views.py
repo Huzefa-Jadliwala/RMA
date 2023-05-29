@@ -16,6 +16,10 @@ from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
 from django.forms import inlineformset_factory
+from django.db.models import Q
+from django.views import View
+from django.http import JsonResponse
+import time
 
 # Create your views here.
 class Dashboard(View):
@@ -45,7 +49,7 @@ class Dashboard(View):
             total_purchase_value += sum((hsncode.purchase_price*hsncode.in_stock) for hsncode in hsncodes)
             total_sell_value += sum((hsncode.sell_price*hsncode.in_stock) for hsncode in hsncodes)
         total_profit_value = total_sell_value - total_purchase_value
-        
+
         context = {
             'daily_total_purchase': daily_total_purchase,
             'daily_total_sell': daily_total_sell,
@@ -65,7 +69,7 @@ class Purchase(APIView):
         total_bills = purchase_bills.count()
         total_payments = pending_payments = paid_payments = paid_bills = pending_bills = 0
         for val in purchase_bills:
-            total_payments += val.total_amount 
+            total_payments += val.total_amount
             if val.payment_status == 'Pending':
                 pending_bills += 1
                 pending_payments += val.total_amount
@@ -85,23 +89,58 @@ class Purchase(APIView):
         }
 
         return render(request, 'app/purchase.html', context=context)
-    
+
+
+class PurchaseBillList(View):
+    def get(self, request, *args, **kwargs):
+        purchase_bills = PurchaseBill.objects.all().order_by('-purchase_date', "-purchase_bill_pk")
+
+        context={
+            'purchase_bills': purchase_bills,
+
+        }
+
+        return render(request, 'app/purchase_bill_list.html', context=context)
+
+
+class PurchaseBillList(View):
+    def get(self, request, *args, **kwargs):
+        search_query = request.GET.get('search')
+
+        purchase_bills = PurchaseBill.objects.all().order_by('-purchase_date', '-purchase_bill_pk')
+
+        if search_query:
+            purchase_bills = purchase_bills.filter(
+                Q(supplier__icontains=search_query) |
+                Q(purchase_bill_pk__icontains=search_query) |
+                Q(purchase_date__icontains=search_query) |
+                Q(total_amount__icontains=search_query) |
+                Q(payment_status__icontains=search_query)
+            )
+
+        context = {
+            'purchase_bills': purchase_bills,
+        }
+
+        return render(request, 'app/purchase_bill_list.html', context=context)
+
+
 class Sell(APIView):
     def get(self, request, *args, **kwargs):
         sell_bills = SellBill.objects.all().order_by('-sell_date', "-sell_bill_pk")
         total_bills = sell_bills.count()
         total_payments = pending_payments = paid_payments = total_profits = pending_profits = paid_profits = pending_bills = paid_bills = 0
         for val in sell_bills:
-            total_payments += val.total_amount 
+            total_payments += val.total_amount
             if val.payment_status == 'Pending':
                 pending_bills += 1
                 pending_payments += val.total_amount
             else:
                 paid_bills += 1
                 paid_payments += val.total_amount
-        
+
         for val in sell_bills:
-            total_profits += val.total_profit 
+            total_profits += val.total_profit
             if val.payment_status == 'Pending':
                 pending_profits += val.total_profit
             else:
@@ -123,7 +162,29 @@ class Sell(APIView):
         }
 
         return render(request, 'app/sell.html', context=context)
-    
+
+
+class SellBillList(View):
+    def get(self, request, *args, **kwargs):
+        search_query = request.GET.get('search')
+
+        sell_bills = SellBill.objects.all().order_by('-sell_date', "-sell_bill_pk")
+
+        if search_query:
+            sell_bills = sell_bills.filter(
+                Q(supplier__icontains=search_query) |
+                Q(sell_bill_pk__icontains=search_query) |
+                Q(sell_date__icontains=search_query) |
+                Q(total_amount__icontains=search_query) |
+                Q(payment_status__icontains=search_query)
+            )
+        context={
+            'sell_bills': sell_bills,
+
+        }
+
+        return render(request, 'app/sell_bill_list.html', context=context)
+
 class ItemMaster(APIView):
     def get(self, request, *args, **kwargs):
         items = Item.objects.all()
@@ -151,17 +212,50 @@ class ItemMaster(APIView):
         }
 
         return render(request, 'app/item_master.html', context=context)
-    
+
+
+class ItemInventory(View):
+    def get(self, request, *args, **kwargs):
+        search_query = request.GET.get('search')
+
+        items = Item.objects.all()
+        item_data = []
+
+        if search_query:
+            items = items.filter(
+                Q(item_name__icontains=search_query) |
+                Q(item_packaging_type__icontains=search_query)
+            )
+
+        for item in items:
+            hsncodes = item.hsncodes.all()
+            stock_in = sum(hsncode.in_stock for hsncode in hsncodes)
+            stock_value = sum(hsncode.stock_value for hsncode in hsncodes)
+            item_data.append({
+                'item_pk': item.item_pk,
+                'item_name': item.item_name,
+                'item_packaging_type': item.item_packaging_type,
+                'stock_in': stock_in,
+                'stock_value': stock_value,
+            })
+
+        context = {
+            'item_data': item_data,
+        }
+
+        return render(request, 'app/item_inventory.html', context=context)
+
+
 class CreateItem(APIView):
     def get(self, request, *args, **kwargs):
         item_form = ItemForm()
         hsncode_form = HSNCodeForm()
-        
+
         context={
-            'item_form': item_form, 
+            'item_form': item_form,
             'hsncode_form': hsncode_form
         }
-    
+
         return render(request, 'app/create_item.html', context=context)
 
     def post(self, request, *args, **kwargs):
@@ -175,7 +269,7 @@ class CreateItem(APIView):
             hsncode.save()
             item.hsncodes.set([hsncode])
             return redirect('item-master')
-        
+
 class UpdateItem(View):
     def get(self, request, item_pk, *args, **kwargs):
         product_form = ItemForm(instance=Item.objects.filter(item_pk = item_pk).first())
@@ -195,7 +289,7 @@ class UpdateItem(View):
             item.item_low_stock_alert = item_low_stock_alert
             item.item_packaging_type = item_packaging_type
             item.save()
-            
+
             return redirect('item-master')
         else:
             product_form = ItemForm(instance=Item.objects.filter(item_pk = item_pk).first())
@@ -228,7 +322,7 @@ class UpdateStock(View):
             hsncode.sell_price = sell_price
             hsncode.stock_value = (int(in_stock)*int(purchase_price))
             hsncode.save()
-            
+
             return redirect('item-master')
         else:
             hsncode_form = HSNCodeForm(instance=HSNCode.objects.filter(hsncode_pk=hsncode_pk, purchase_price = purchase_price).first())
@@ -244,7 +338,7 @@ class DeleteItem(View):
             hsncode_obj = HSNCode.objects.filter(hsncode_pk=hsncode.hsncode_pk).first()
             hsncode_obj.delete()
         item.delete()
-        
+
         return redirect('item-master')
 class DeleteStock(View):
     def get(self, request, item_pk, hsncode_pk, purchase_price, *args, **kwargs):
@@ -252,27 +346,27 @@ class DeleteStock(View):
         hsncode.delete()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    
+
 class ItemDetails(APIView):
     def get(self, request, pk, *args, **kwargs):
         item = Item.objects.get(item_pk=pk)
-        
+
         context={
             'item': item
             }
-        
+
         return render(request, 'app/item_details.html',context=context)
-    
+
 class AddStock(APIView):
     def get(self, request, *args, **kwargs):
         items = Item.objects.all()
         hsncode_form = HSNCodeForm()
-        
+
         context={
-            'items': items, 
+            'items': items,
             'hsncode_form': hsncode_form
         }
-    
+
         return render(request, 'app/add_stock.html', context=context)
     def post(self, request, *args, **kwargs):
         item_pk = request.POST.get('product')
@@ -289,7 +383,7 @@ class AddStock(APIView):
             item.hsncodes.set(hsncodes)
             return redirect('item-master')
         return HttpResponse("Hello world post")
-    
+
 
 class ViewPurchaseBill(APIView):
     def get(self, request, pk, *args, **kwargs):
@@ -309,7 +403,7 @@ class ViewPurchaseBill(APIView):
             'bill_items': bill_items,
         }
         return render(request, 'app/bill_details.html', context=context)
-    
+
 
 class CreateSellBill(APIView):
 
@@ -342,7 +436,7 @@ class CreateSellBill(APIView):
             'sell_item_form': sell_item_form
         }
         return render(request, 'app/create_sell_bill.html', context=context)
-    
+
 
 class ViewSellBill(APIView):
     def get(self, request, pk, *args, **kwargs):
@@ -362,7 +456,7 @@ class ViewSellBill(APIView):
             'bill_items': bill_items,
         }
         return render(request, 'app/sell_bill_details.html', context=context)
-    
+
 class CreatePurchaseBillView(View):
     def get(self, request, *args, **kwargs):
         purchase_bill_form = PurchaseBillForm()
@@ -380,7 +474,7 @@ class CreatePurchaseBillView(View):
         if purchase_bill_form.is_valid() and formset.is_valid():
             purchase_bill = purchase_bill_form.save()
 
-            for form in formset: 
+            for form in formset:
                 item = form.cleaned_data['item']
                 hsncode = form.cleaned_data['hsncode']
                 quantity = form.cleaned_data['quantity']
@@ -390,7 +484,7 @@ class CreatePurchaseBillView(View):
                 purchase_item = PurchaseItem.objects.create(purchase_bill=purchase_bill, item=item, hsncode=hsncode, quantity=quantity, pprice=pprice, sprice=sprice)
                 purchase_item.save()
 
-                
+
                 try:
                     item_obj = Item.objects.get(item_name=item)
                 except Item.DoesNotExist:
@@ -406,25 +500,25 @@ class CreatePurchaseBillView(View):
                     else:
                         new_hsncode_obj = HSNCode.objects.create(hsncode_pk=hsncode, in_stock=quantity, purchase_price=pprice, sell_price=sprice)
                         item_obj.hsncodes.add(new_hsncode_obj)
-                        
+
                 hsncode_present = item_obj.hsncodes.filter(hsncode_pk=hsncode).exists()
                 if hsncode_present:
                     pass
                 else:
                     item_obj.hsncodes.add(hsncode_obj)
-            
+
             purchase_bill.total_amount = total_amount
             purchase_bill.save()
-            
+
             return redirect('purchase')
-        
+
         context = {
             'purchase_bill_form': purchase_bill_form,
             'formset': formset,
         }
 
         return render(request, 'app/create_purchase_bill.html', context)
-    
+
 
 class CreateSellBillView(View):
 
@@ -436,14 +530,14 @@ class CreateSellBillView(View):
             'formset': formset
         }
         return render(request, 'app/create_sell_bill.html', context)
-    
+
     def post(self, request, *args, **kwargs):
         sell_bill_form = SellBillForm(request.POST)
         formset = SellItemFormset(request.POST)
         total_amount = total_profit = 0
         if sell_bill_form.is_valid() and formset.is_valid():
             sell_bill = sell_bill_form.save()
-            for form in formset: 
+            for form in formset:
                 item = form.cleaned_data['item']
                 hsncode_instance = form.cleaned_data['hsncode']
                 hsncode = str(form.cleaned_data['hsncode'])[:5]
@@ -460,20 +554,20 @@ class CreateSellBillView(View):
                 hsncode_obj.in_stock -= quantity
                 hsncode_obj.cal_stock_val()
                 hsncode_obj.save()
-                    
+
             sell_bill.total_amount = total_amount
             sell_bill.total_profit = total_profit
             sell_bill.save()
-            
+
             return redirect('sell')
-        
+
         context = {
             'sell_bill_form': sell_bill_form,
             'formset': formset,
         }
 
         return render(request, 'app/create_sell_bill.html', context)
-    
+
 
 class DeletePurchaseBillView(View):
     def get(self, request, pk, *args, **kwargs):
@@ -481,13 +575,13 @@ class DeletePurchaseBillView(View):
         purchase_items = PurchaseItem.objects.filter(purchase_bill=purchase_bill)
         for purchase_item in purchase_items:
             hsncode = HSNCode.objects.filter(hsncode_pk = purchase_item.hsncode, purchase_price = purchase_item.pprice, sell_price = purchase_item.sprice).first()
-            hsncode.in_stock -= purchase_item.quantity 
+            hsncode.in_stock -= purchase_item.quantity
             hsncode.cal_stock_val()
             hsncode.save()
         purchase_bill.delete()
-        
+
         return redirect('purchase')
-    
+
 class UpdateSellBillView(View):
     def get(self, request, pk, *args, **kwargs):
         return redirect('sell')
@@ -498,65 +592,76 @@ class DeleteSellBillView(View):
         sell_items = SellItem.objects.filter(sell_bill=sell_bill)
         for sell_item in sell_items:
             hsncode = HSNCode.objects.filter(hsncode_pk = sell_item.hsncode.hsncode_pk).first()
-            hsncode.in_stock += sell_item.quantity 
+            hsncode.in_stock += sell_item.quantity
             hsncode.cal_stock_val()
             hsncode.save()
         sell_bill.delete()
         return redirect('sell')
-    
 
-#Plotting line graph to show the sells of the month
-@method_decorator(never_cache, name='dispatch')
-class LineChartJSONView(BaseLineChartView):
-    today = date.today()
 
-    day_of_month = today.replace(day=1)
-    first_day = today.replace(day=1)
-    last_day = today.replace(day=1, month=today.month % 12 + 1) - timedelta(days=1)
+class LineChartJSONView(View):
+    def get(self, request, *args, **kwargs):
+        timestamp = int(time.time())
 
-    dates = []
-    purchase_value_on_date = []
-    sell_value_on_date = []
+        today = date.today()
+        day_of_month = today.replace(day=1)
+        first_day = today.replace(day=1)
+        last_day = today.replace(day=1, month=today.month % 12 + 1) - timedelta(days=1)
 
-    sell_bills = SellBill.objects.filter(sell_date__range=[first_day, last_day]).values('sell_date').annotate(total_sell_value=Sum('total_amount')).order_by('sell_date')
-    purchase_bills = PurchaseBill.objects.filter(purchase_date__range=[first_day, last_day]).values('purchase_date').annotate(total_purchase_value=Sum('total_amount')).order_by('purchase_date')
+        dates = []
+        purchase_value_on_date = []
+        sell_value_on_date = []
 
-    for i in range(1, 30):
-        dates.append(str(day_of_month))
-        for sell_bill in sell_bills:
-            if str(sell_bill['sell_date']) == str(day_of_month):
-                val = int(sell_bill['total_sell_value'])
-                break
-            else:
-                val = 0
-        sell_value_on_date.append(val)
+        sell_bills = SellBill.objects.filter(sell_date__range=[first_day, last_day]).values('sell_date').annotate(total_sell_value=Sum('total_amount')).order_by('sell_date')
+        purchase_bills = PurchaseBill.objects.filter(purchase_date__range=[first_day, last_day]).values('purchase_date').annotate(total_purchase_value=Sum('total_amount')).order_by('purchase_date')
 
-        for purchase_bill in purchase_bills:
-            if str(purchase_bill['purchase_date']) == str(day_of_month):
-                val = int(purchase_bill['total_purchase_value'])
-                break
-            else:
-                val = 0
-        purchase_value_on_date.append(val)
+        for i in range(1, 30):
+            dates.append(str(day_of_month))
+            for sell_bill in sell_bills:
+                if str(sell_bill['sell_date']) == str(day_of_month):
+                    val = int(sell_bill['total_sell_value'])
+                    break
+                else:
+                    val = 0
+            sell_value_on_date.append(val)
 
-        day_of_month = day_of_month.replace(day=(i+1))
+            for purchase_bill in purchase_bills:
+                if str(purchase_bill['purchase_date']) == str(day_of_month):
+                    val = int(purchase_bill['total_purchase_value'])
+                    break
+                else:
+                    val = 0
+            purchase_value_on_date.append(val)
 
-    def get_labels(self):
-        """Return 7 labels for the x-axis."""
-        return self.dates
+            day_of_month = day_of_month.replace(day=(i+1))
 
-    def get_providers(self):
-        """Return names of datasets."""
-        return ["Purchase", "Sell"]
+        chart_data = {
+            'labels': dates,
+            'datasets': [
+                {
+                    'label': 'Purchase',
+                    'data': purchase_value_on_date,
+                },
+                {
+                    'label': 'Sell',
+                    'data': sell_value_on_date,
+                }
+            ]
+        }
 
-    def get_data(self):
-        """Return 3 datasets to plot."""
+        response = JsonResponse(chart_data)
 
-        return [self.purchase_value_on_date, self.sell_value_on_date]
-    
+        # Set cache control headers to prevent caching
+        response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response["Pragma"] = "no-cache"
+        response["Expires"] = "0"
+
+        return response
+
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
-    
+
+
 
 
 @never_cache
@@ -632,7 +737,7 @@ class UpdatePurchaseBillView(View):
         purchase_bill_form = PurchaseBillForm(request.POST, instance=purchase_bill)
         PurchaseItemFormset = inlineformset_factory(PurchaseBill, PurchaseItem, form=PurchaseItemForm, extra=0)
         formset = PurchaseItemFormset(request.POST, instance=purchase_bill)
-        
+
         total_amount = 0
         #print(purchase_bill_form.is_valid(), formset.is_valid())
         #print(formset)
@@ -677,3 +782,6 @@ class UpdatePurchaseBillView(View):
             'formset': formset,
         }
         return render(request, 'app/update_purchase_bill.html', context)
+    
+
+

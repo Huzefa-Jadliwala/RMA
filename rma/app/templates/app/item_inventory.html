@@ -1,0 +1,52 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <div class="main_content">
+        <div class="row mt-3">
+            <div class="col-md-7 col-sm-12">
+                <a href="{% url 'item-master' %}" class="btn btn-primary">Back</a>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <h1>ITEM INVENTORY</h1>
+        </div>  
+        <div class="info m-3">
+            <form method="GET">
+                <div class="row m-3">
+                    <div class="col-md-11">
+                        <input type="text" class="form-control" name="search" placeholder="Search">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">PRODUCT NAME</th>
+                        <th scope="col">PACKAGING TYPE</th>
+                        <th scope="col">CURRENT STOCKS</th>
+                        <th scope="col">STOCK VALUE</th>
+                        <th scope="col">UPDATE DETAILS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in item_data %}
+                    <tr {% if search_query and search_query|lower in item.item_name|lower %}class="highlight"{% endif %}>
+                            <td scope="row">{{ item.item_name }}</td>
+                            <td>{{ item.item_packaging_type }}</td>
+                            <td>{{ item.stock_in }}</td>
+                            <td>{{ item.stock_value }}</td>
+                            <td>
+                                <a href="{% url 'item-details' item.item_pk %}" class="rm-defualt-btn-style m-1">
+                                    <button type="button" class="btn btn-secondary">View Details</button>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}
