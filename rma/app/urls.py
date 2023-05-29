@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from .views import Dashboard, Purchase, Sell, ItemMaster, CreateItem, UpdateItem, SellBillList, PurchaseBillList, UpdateStock,ItemDetails,ItemInventory, AddStock, CreatePurchaseBillView, ViewPurchaseBill, CreateSellBillView, ViewSellBill, DeleteItem, DeleteStock, UpdateSellBillView, DeleteSellBillView, UpdatePurchaseBillView, DeletePurchaseBillView
-from .views import LineChartJSONView, pie_chart_json
+from .views import LineChartJSONView, pie_chart_json, send_database_email
 urlpatterns = [
     path('', Dashboard.as_view(), name='dashboard'),
     path('item-master', ItemMaster.as_view(), name='item-master'),
@@ -27,7 +27,6 @@ urlpatterns = [
     path('sell/create/<int:pk>/', ViewSellBill.as_view(),name="sell-bill-details"),
     
 
-
     path('purchase', Purchase.as_view(), name='purchase'),
     path('purchase-list', PurchaseBillList.as_view(), name='purchase-bill-list'),
     path('purchase/create', CreatePurchaseBillView.as_view(),name="create-purchase-bill"),
@@ -35,7 +34,11 @@ urlpatterns = [
     path('purchase/delete/<int:pk>/', DeletePurchaseBillView.as_view(),name="delete-purchase-bill"),
     path('purchase/create/<int:pk>/', ViewPurchaseBill.as_view(),name="purchase-bill-details"),
 
+
     path('chartJSON', LineChartJSONView.as_view(), name='line_chart_json'),
     path('chart/pie', pie_chart_json, name='pie_chart_json'),
+
+    path('send_email/', send_database_email, name='send_email'),
+
 
 ]

@@ -20,6 +20,13 @@ from django.db.models import Q
 from django.views import View
 from django.http import JsonResponse
 import time
+import os
+import smtplib
+import mimetypes
+from email.message import EmailMessage
+from django.conf import settings
+from django.http import HttpResponse
+from django.core.mail import send_mail
 
 # Create your views here.
 class Dashboard(View):
@@ -784,4 +791,10 @@ class UpdatePurchaseBillView(View):
         return render(request, 'app/update_purchase_bill.html', context)
     
 
-
+def send_database_email(request):
+    subject = 'abds'
+    message = "kjjbjas"
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = ['huzijadli@gmail.com']
+    send_mail(subject, message, from_email, recipient_list)
+    return HttpResponse("DONE")

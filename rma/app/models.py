@@ -2,12 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-packging_types = [
-    ("1 Pc", "1 Piece"),
-    ("1 bx", "1 Box"),
-    ("10 Tabs", "10 Tablets"),
-]
-
 payment_status_choices = [
     ("Pending", "Payment is yet to be done"),
     ("Paid", "Payment is done")
@@ -30,8 +24,10 @@ class HSNCode(models.Model):
 class Item(models.Model):
     item_pk = models.AutoField(primary_key=True)
     item_name = models.CharField(max_length = 180)
+    item_detail = models.TextField(max_length=200)
     item_low_stock_alert = models.IntegerField(default=0)
-    item_packaging_type =  models.CharField(max_length=7, choices=packging_types)
+    item_packaging_type =  models.CharField(max_length=50)
+    item_company = models.CharField(max_length=50)
     hsncodes = models.ManyToManyField(HSNCode, blank=True, related_name='item', related_query_name='item')
 
     def __str__(self):

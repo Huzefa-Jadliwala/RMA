@@ -7,12 +7,14 @@ class ItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['item_name'].widget.attrs.update({'class': 'textinput form-control setprice item_name', 'required': 'true'})
+        self.fields['item_detail'].widget.attrs.update({'class': 'textinput form-control setprice item_detail', 'required': 'true'})
         self.fields['item_low_stock_alert'].widget.attrs.update({'class': 'textinput form-control setprice item_low_stock_alert', 'required': 'true'})
         self.fields['item_packaging_type'].widget.attrs.update({'class': 'form-select form-control setprice item_packaging_type', 'required': 'true'})
+        self.fields['item_company'].widget.attrs.update({'class': 'textinput form-control setprice item_company', 'required': 'true'})
 
     class Meta:
         model = Item
-        fields = ['item_name', 'item_low_stock_alert', 'item_packaging_type']
+        fields = ['item_name', 'item_detail', 'item_low_stock_alert', 'item_packaging_type', "item_company"]
 
 class HSNCodeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
