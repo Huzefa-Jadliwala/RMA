@@ -3,7 +3,7 @@
 
 {% block content %}
     <div class="main_content">
-        <div class="header"><h3>Dashboard</h3></div>  
+        <div class="header"><h3>Dashboard</h3></div>
         <div class="info">
             <div class="m-3 p-2">
                 <div class="row m-2">
@@ -98,15 +98,35 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
-    <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'jquery-1.10.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'Chart.min.js' %}"></script>
     <script type="text/javascript">
-        $.get('{% url "line_chart_json" %}', function(data) {
-            var ctx = $("#myChart").get(0).getContext("2d");
-            new Chart(ctx, {
-                type: 'line', data: data
+        var timestamp = new Date().getTime();
+
+        $.get('{% url "line_chart_json" %}?v=' + timestamp, function(data) {
+        var ctx = $("#myChart").get(0).getContext("2d");
+
+        // Define colors for each dataset
+        var datasetColors = ['#FF6384', '#36A2EB'];
+
+        // Assign colors to datasets
+        var datasets = data.datasets.map(function(dataset, index) {
+            return Object.assign({}, dataset, {
+                backgroundColor: datasetColors[index],
+                borderColor: datasetColors[index],
+                pointBackgroundColor: datasetColors[index],
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: datasetColors[index]
             });
         });
+
+        // Create the chart
+        new Chart(ctx, {
+            type: 'line',
+            data: Object.assign({}, data, { datasets: datasets })
+        });
+    });
         $.get('{% url "pie_chart_json" %}', function(data) {
             var ctx = $("#pieChart").get(0).getContext("2d");
             new Chart(ctx, {

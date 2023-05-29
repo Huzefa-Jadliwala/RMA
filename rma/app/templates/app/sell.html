@@ -86,36 +86,8 @@
                 </div>
             </div>
         </div>
-        <div class="info m-1">
-            <h2 class="d-flex justify-content-center mb-3">PREVIOUS BILLS</h2>
-            <table class="table">
-                <thead class="thead-dark">
-                  <tr>
-                    <th scope="col">BILL NUMBER</th>
-                    <th scope="col">BILL DATE</th>
-                    <th scope="col">SUPPLIER NAME</th>
-                    <th scope="col">BILL AMOUNT</th>
-                    <th scope="col">PAYMENT STATUS</th>
-                    <th scope="col">TOTAL PROFIT</th>
-                    <th scope="col">VIEW DETAILS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                    {% for sell_bill in sell_bills %}
-                        <tr>
-                            <td scope="row">{{ sell_bill.sell_bill_pk }}</td>
-                            <td>{{ sell_bill.sell_date }}</td>
-                            <td>{{ sell_bill.supplier }}</td>
-                            <td>{{ sell_bill.total_amount }}</td>
-                            <td>{{ sell_bill.payment_status }}</td>
-                            <td>{{ sell_bill.total_profit }}</td>
-                            <td>
-                                <a href="{% url 'sell-bill-details' sell_bill.sell_bill_pk %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-secondary">View Details</button></a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-              </table>
+        <div class="buttons m-1">
+            <a href="{% url 'sell-bill-list' %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-outline-dark btn-lg btn-block">PREVIOUS SELL BILL</button></a>
         </div>
     </div>
 {% endblock content%}

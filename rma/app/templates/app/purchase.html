@@ -60,35 +60,8 @@
                 </div>
             </div>
         </div>
-        <div class="info m-3">
-            <h2 class="d-flex justify-content-center mb-3">PREVIOUS BILLS</h2>
-            <table class="table">
-                <thead class="thead-dark">
-                  <tr>
-                    <th scope="col">BILL NUMBER</th>
-                    <th scope="col">BILL DATE</th>
-                    <th scope="col">SUPPLIER NAME</th>
-                    <th scope="col">BILL AMOUNT</th>
-                    <th scope="col">PAYMENT STATUS</th>
-                    <th scope="col">VIEW DETAILS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                    {% for purchase_bills in purchase_bills %}
-                        <tr>
-                            <td scope="row">{{ purchase_bills.purchase_bill_pk }}</td>
-                            <td>{{ purchase_bills.purchase_date }}</td>
-                            <td>{{ purchase_bills.supplier }}</td>
-                            <td>{{ purchase_bills.total_amount }}</td>
-                            <td>{{ purchase_bills.payment_status }}</td>
-
-                            <td>
-                                <a href="{% url 'purchase-bill-details' purchase_bills.purchase_bill_pk %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-secondary">View Details</button></a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-              </table>
+        <div class="buttons m-1">
+            <a href="{% url 'purchase-bill-list' %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-outline-dark btn-lg btn-block">PREVIOUS PURCHASE BILL</button></a>
         </div>
     </div>
 {% endblock content%}

@@ -3,9 +3,9 @@
 
 {% block content %}
     <h1 class="d-flex justify-content-center">CREATE SELL BILL</h1>
-    
+
     <form method="post" class="panel panel-default">
-            
+
         {% csrf_token %}
         <div class="row form-row">
             <div class="form-group col-md-4">
@@ -24,11 +24,11 @@
                 {{ sell_bill_form.payment_status }}
             </div>
         </div>
-        
+
         {{ formset.management_form }}
         <div class="panel-heading panel-heading-text">Product Details</div>
-        
-            <div id="stockitem"> 
+
+            <div id="stockitem">
                 <div class="panel-body">
                 {% for form in formset %}
                     <div class="row form-row">
@@ -60,7 +60,7 @@
                         </div>
                     </div>
                 {% endfor %}
-                    <div style="text-align: right;">                    
+                    <div style="text-align: right;">
                         <a href="#" class="add-form-row">+ Add More</a>
                     </div>
                 </div>
@@ -74,13 +74,13 @@
             <a href="{% url 'sell' %}" class="btn btn-danger">Go Back</a>
             <a href="{% url 'sell' %}" class="btn btn-secondary">Cancel</a>
         </div>
-        
+
     </form>
-    <script type="text/javascript" src="{% static 'app/jquery-3.2.1.slim.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'app/dialogbox.js' %}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="{% static 'jquery-3.2.1.slim.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'dialogbox.js' %}"></script>
+    <script type="text/javascript" src="{% static 'jquery-3.6.0.min.js' %}"></script>
     <script type="text/javascript">
-        
+
         //creates custom alert object
         var custom_alert = new custom_alert();
 
@@ -91,7 +91,7 @@
             if (el.id) el.id = el.id.replace(id_regex, replacement);
             if (el.name) el.name = el.name.replace(id_regex, replacement);
         }
-        
+
         //stores the total no of item forms
         var total = 1;
 
@@ -118,7 +118,7 @@
             $(selector).after(newElement);
             return false;
         }
-        
+
         function deleteForm(prefix, btn) {
             //var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
             if (total > 1){
@@ -136,13 +136,13 @@
             }
             return false;
         }
-        
+
         $(document).on('click', '.add-form-row', function(e){
             e.preventDefault();
             cloneMore('.form-row:last', 'form');
             return false;
         });
-        
+
         $(document).on('click', '.remove-form-row', function(e){
             e.preventDefault();
             deleteForm('form', $(this));
@@ -150,7 +150,7 @@
         });
 
 
-        //updates the total price by multiplying 'price per item' and 'quantity' 
+        //updates the total price by multiplying 'price per item' and 'quantity'
         $(document).on('change', '.setprice', function(e){
             e.preventDefault();
             //gets the values
