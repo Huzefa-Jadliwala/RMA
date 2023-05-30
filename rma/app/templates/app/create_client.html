@@ -1,0 +1,39 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+  <div class="row my-3">
+    <div class="col-md-7 col-sm-12 ">
+        <a href="{% url 'client' %}" class="btn btn-primary">Back</a>
+    </div>
+  </div>
+  <h1 class="d-flex justify-content-center">CREATE NEW CLIENT</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mt-3">
+      <div class="form-group row">
+        <label for="client_name" class="col-sm-2 col-form-label">Client Name:</label>
+        <div class="col-sm-3">
+          {{ clientform.client_name }}
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="client_location" class="col-sm-2 col-form-label">Client Location:</label>
+        <div class="col-sm-3">
+          {{ clientform.client_location }}
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="client_gst" class="col-sm-2 col-form-label">Client GST Number:</label>
+        <div class="col-sm-3">
+          {{ clientform.client_gst }}
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="client_dl" class="col-sm-1 col-form-label">Client DL Number:</label>
+        <div class="col-sm-4">
+          {{ clientform.client_dl }}
+        </div>
+    </div>
+    <button type="submit" class="btn btn-outline-secondary btn-lg btn-block">CREATE SUPPLIER</button>
+  </form>
+{% endblock %}

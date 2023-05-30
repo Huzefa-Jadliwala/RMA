@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from rest_framework.views import APIView
 from .models import Item, HSNCode, PurchaseItem, PurchaseBill, SellItem, SellBill
-from .forms import ItemForm, HSNCodeForm, PurchaseItemForm, PurchaseBillForm, SellBillForm, SellItemForm, SellItemForm, PurchaseItemFormset, SellItemFormset
+from .models import SupplierModel, ClientModel
+from .forms import ItemForm, HSNCodeForm, PurchaseItemForm, PurchaseBillForm, SellBillForm, SellItemForm, SellItemForm, PurchaseItemFormset, SellItemFormset, ClientForm, SupplierForm
 from django.views.generic import UpdateView, CreateView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from django.views import View
 from django.forms import formset_factory
 from django.views.generic import TemplateView
@@ -20,6 +21,15 @@ from django.db.models import Q
 from django.views import View
 from django.http import JsonResponse
 import time
+from email.message import EmailMessage
+from django.conf import settings
+from django.http import HttpResponse
+from django.core.mail import send_mail
+import os
+import shutil
+from django.conf import settings
+from django.contrib import messages
+
 
 # Create your views here.
 class Dashboard(View):
@@ -784,4 +794,160 @@ class UpdatePurchaseBillView(View):
         return render(request, 'app/update_purchase_bill.html', context)
     
 
+class Supplier(View):
+    def get(self, request, *args, **kwargs):
+        search_query = request.GET.get('search', '')
+        suppliers = SupplierModel.objects.filter(Q(supplier_name__icontains=search_query))
+        context = {
+            'suppliers': suppliers,
+        }
+        return render(request, 'app/supplier.html', context)
 
+
+class CreateSupplier(View):
+    def get(self, request, *args, **kwargs):
+        supplierform = SupplierForm()
+
+        context = {
+            'supplierform': supplierform,
+        }
+
+        return render(request, 'app/create_supplier.html', context)
+
+    def post(self, request, *args, **kwargs):
+        supplierform = SupplierForm(request.POST)
+        if supplierform.is_valid():
+            supplierform.save()
+            return redirect('supplier')
+        else:
+            context = {
+            'supplierform': supplierform,
+        }
+
+        return render(request, 'app/create_supplier.html', context)
+        
+
+class UpdateSupplier(View):
+    def get(self, request, supplier_id, *args, **kwargs):
+        supplier = SupplierModel.objects.get(supplier_id=supplier_id)
+        supplierform = SupplierForm(instance=supplier)
+
+        context = {
+            'supplierform': supplierform,
+        }
+
+        return render(request, 'app/update_supplier.html', context)
+
+    def post(self, request, supplier_id, *args, **kwargs):
+        supplier = SupplierModel.objects.get(supplier_id=supplier_id)
+        supplierform = SupplierForm(request.POST, instance=supplier)
+        if supplierform.is_valid():
+            supplierform.save()
+            return redirect('supplier')
+
+
+class DeleteSupplier(View):
+    def get(self, request, supplier_id, *args, **kwargs):
+        supplier = SupplierModel.objects.get(supplier_id=supplier_id)
+        supplier.delete()
+        
+        return redirect('supplier')
+
+
+class Client(View):
+    def get(self, request, *args, **kwargs):
+        search_query = request.GET.get('search', '')
+        clients = ClientModel.objects.filter(Q(client_name__icontains=search_query))
+        context = {
+            'clients': clients,
+        }
+        return render(request, 'app/client.html', context)
+    
+class CreateClient(View):
+    def get(self, request, *args, **kwargs):
+        clientform = ClientForm()
+        context = {
+            'clientform': clientform,
+        }
+        return render(request, 'app/create_client.html', context)
+
+    def post(self, request, *args, **kwargs):
+        clientform = ClientForm(request.POST)
+        if clientform.is_valid():
+            clientform.save()
+            return redirect('client')
+        else:
+            context = {
+                'clientform': clientform,
+            }
+            return render(request, 'app/create_client.html', context)
+
+
+class UpdateClient(View):
+    def get(self, request, client_id, *args, **kwargs):
+        client = ClientModel.objects.get(client_id=client_id)
+        clientform = ClientForm(instance=client)
+        context = {
+            'clientform': clientform,
+            'client_id': client_id,
+        }
+        return render(request, 'app/update_client.html', context)
+
+    def post(self, request, client_id, *args, **kwargs):
+        client = ClientModel.objects.get(client_id=client_id)
+        clientform = ClientForm(request.POST, instance=client)
+        if clientform.is_valid():
+            clientform.save()
+            return redirect('client')
+        else:
+            context = {
+                'clientform': clientform,
+                'client_id': client_id,
+            }
+            return render(request, 'app/update_client.html', context)
+
+
+class DeleteClient(View):
+    def get(self, request, client_id, *args, **kwargs):
+        client = ClientModel.objects.get(client_id=client_id)
+        client.delete()
+        return redirect('client')
+    
+    
+
+def backup_database(request):
+    # Define the source database file path
+    source_path = settings.DATABASES['default']['NAME']
+
+    # Define the destination folder path for the backup
+    backup_folder = os.path.join(settings.BASE_DIR, 'database_backups')
+
+    # Create the backup folder if it doesn't exist
+    os.makedirs(backup_folder, exist_ok=True)
+
+    # Generate a new filename for the backup
+    backup_filename = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+
+    # Create the destination file path
+    backup_path = os.path.join(backup_folder, backup_filename)
+
+    # Perform the backup by copying the source file to the destination folder
+    shutil.copy2(source_path, backup_path)
+
+    # Delete older backup files, keeping only the last 5 backups
+    backup_files = sorted(os.listdir(backup_folder))
+    num_backups_to_keep = 5
+
+    if len(backup_files) > num_backups_to_keep:
+        backups_to_delete = backup_files[:-num_backups_to_keep]
+        for backup_to_delete in backups_to_delete:
+            backup_file_path = os.path.join(backup_folder, backup_to_delete)
+            os.remove(backup_file_path)
+
+
+    # Display a success message using Django's messages framework
+    messages.success(request, 'Database backup created successfully.')
+
+
+    # Optionally, you can provide a response or redirect to indicate the backup was successful
+    return redirect('dashboard')

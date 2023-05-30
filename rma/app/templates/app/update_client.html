@@ -1,0 +1,15 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+  <div class="row my-3">
+    <div class="col-md-7 col-sm-12 ">
+        <a href="{% url 'client' %}" class="btn btn-primary">Back</a>
+    </div>
+  </div>
+  <h1 class="d-flex justify-content-center">UPDATE CLIENT</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ clientform.as_p }}
+    <button type="submit" class="btn btn-outline-secondary btn-lg btn-block">UPDATE CLIENT</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <div class="main_content">
+        <div><h3>CLIENT</h3></div>  
+        <div class="buttons m-1">
+            <a href="{% url 'create-client' %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-primary btn-lg btn-block">CREATE CLIENT</button></a>
+        </div>
+        <div class="d-flex justify-content-center">
+            <h1>CLIENTS LIST</h1>
+        </div>  
+        <div class="info m-3">
+            <form method="GET" action="{% url 'client' %}">
+                <div class="row m-3">
+                    <div class="col-md-11">
+                        <input type="text" name="search" class="form-control" placeholder="Search by Client Name" value="{{ request.GET.search }}">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">CLIENT NAME</th>
+                        <th scope="col">CLIENT LOCATION</th>
+                        <th scope="col">CLIENT GST</th>
+                        <th scope="col">CLIENT DL</th>
+                        <th scope="col">PENDING PAYMENT</th>
+                        <th scope="col">OTHER ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                        <tr>
+                            <td scope="row">{{ client.client_name }}</td>
+                            <td>{{ client.client_location }}</td>
+                            <td>{{ client.client_gst }}</td>
+                            <td>{{ client.client_dl }}</td>
+                            <td>{{ client.pending_payment }}</td>
+                            <td>
+                                <a href="{% url 'update-client' client.client_id %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-secondary">UPDATE</button></a>
+                                <a href="{% url 'delete-client' client.client_id %}" class="rm-defualt-btn-style m-1"><button type="button" class="btn btn-danger">DELETE</button></a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No clients found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}
