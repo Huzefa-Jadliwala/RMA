@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import Dashboard, Purchase, Sell, ItemMaster, CreateItem, UpdateItem, SellBillList, PurchaseBillList, UpdateStock,ItemDetails,ItemInventory, AddStock, CreatePurchaseBillView, ViewPurchaseBill, CreateSellBillView, ViewSellBill, DeleteItem, DeleteStock, UpdateSellBillView, DeleteSellBillView, UpdatePurchaseBillView, DeletePurchaseBillView
-from .views import LineChartJSONView, pie_chart_json, send_database_email
+from .views import Dashboard, Purchase, Sell, ItemMaster, CreateItem, UpdateItem, UpdateClient, DeleteClient, UpdateSupplier, DeleteSupplier, SellBillList, CreateSupplier, CreateClient, PurchaseBillList, Supplier, Client, UpdateStock,ItemDetails,ItemInventory, AddStock, CreatePurchaseBillView, ViewPurchaseBill, CreateSellBillView, ViewSellBill, DeleteItem, DeleteStock, UpdateSellBillView, DeleteSellBillView, UpdatePurchaseBillView, DeletePurchaseBillView
+from .views import LineChartJSONView, pie_chart_json, backup_database
 urlpatterns = [
     path('', Dashboard.as_view(), name='dashboard'),
     path('item-master', ItemMaster.as_view(), name='item-master'),
@@ -38,7 +38,20 @@ urlpatterns = [
     path('chartJSON', LineChartJSONView.as_view(), name='line_chart_json'),
     path('chart/pie', pie_chart_json, name='pie_chart_json'),
 
-    path('send_email/', send_database_email, name='send_email'),
+    path('backup_database/', backup_database, name='backup_database'),
+
+    path('supplier/', Supplier.as_view(), name='supplier'),
+    path('supplier/create', CreateSupplier.as_view(), name='create-supplier'),
+    path('supplier/update/<int:supplier_id>/', UpdateSupplier.as_view(), name='update-supplier'),
+    path('supplier/delete/<int:supplier_id>/', DeleteSupplier.as_view(), name='delete-supplier'),
+
+
+    
+    path('client/', Client.as_view(), name='client'),
+    path('client/create', CreateClient.as_view(), name='create-client'),
+    path('update-client/<int:client_id>/', UpdateClient.as_view(), name='update-client'),
+    path('delete-client/<int:client_id>/', DeleteClient.as_view(), name='delete-client'),
+
 
 
 ]

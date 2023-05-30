@@ -33,11 +33,34 @@ class Item(models.Model):
     def __str__(self):
         return self.item_name
     
+class SupplierModel(models.Model):
+    supplier_id = models.AutoField(primary_key=True)
+    supplier_name = models.CharField(max_length = 50)
+    supplier_location = models.CharField(max_length = 100)
+    pending_payment = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    supplier_gst = models.CharField(max_length = 15, blank=True, null=True)
+    supplier_dl= models.CharField(max_length = 50, blank=True, null=True)
+
+
+    def __str__(self):
+        return self.supplier_name
+    
+class ClientModel(models.Model):
+    client_id = models.AutoField(primary_key=True)
+    client_name = models.CharField(max_length = 50)
+    client_location = models.CharField(max_length = 100)
+    pending_payment = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    client_gst = models.CharField(max_length = 15, blank=True, null=True)
+    client_dl= models.CharField(max_length = 50, blank=True, null=True)
+
+    def __str__(self):
+        return self.client_name
+
 
 class PurchaseBill(models.Model):
     purchase_bill_pk = models.AutoField(primary_key=True)
     purchase_date = models.DateField(default=timezone.now())
-    supplier = models.CharField(max_length=100)
+    supplier = models.ForeignKey(SupplierModel, on_delete=models.CASCADE)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_status = models.CharField(max_length=25, choices=payment_status_choices, default="Pending")
     items = models.ManyToManyField(Item, through='PurchaseItem')
@@ -58,7 +81,7 @@ class PurchaseItem(models.Model):
 class SellBill(models.Model):
     sell_bill_pk = models.AutoField(primary_key=True)
     sell_date = models.DateField(default=timezone.now())
-    supplier = models.CharField(max_length=100)
+    client = models.ForeignKey(ClientModel, on_delete=models.CASCADE)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     payment_status = models.CharField(max_length=25, choices=payment_status_choices, default="Pending")

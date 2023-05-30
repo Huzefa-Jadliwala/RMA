@@ -1,20 +1,44 @@
 from django import forms
-from .models import Item, HSNCode, PurchaseBill, PurchaseItem, SellBill, SellItem
+from .models import Item, HSNCode, PurchaseBill, PurchaseItem, SellBill, SellItem, SupplierModel, ClientModel
 from django.forms import formset_factory
 
 
 class ItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['item_name'].widget.attrs.update({'class': 'textinput form-control setprice item_name', 'required': 'true'})
-        self.fields['item_detail'].widget.attrs.update({'class': 'textinput form-control setprice item_detail', 'required': 'true'})
-        self.fields['item_low_stock_alert'].widget.attrs.update({'class': 'textinput form-control setprice item_low_stock_alert', 'required': 'true'})
-        self.fields['item_packaging_type'].widget.attrs.update({'class': 'form-select form-control setprice item_packaging_type', 'required': 'true'})
-        self.fields['item_company'].widget.attrs.update({'class': 'textinput form-control setprice item_company', 'required': 'true'})
+        self.fields['item_name'].widget.attrs.update({'class': 'textinput form-control setprice item_name', 'required': 'true' , 'autocomplete': "off"})
+        self.fields['item_detail'].widget.attrs.update({'class': 'textinput form-control setprice item_detail', 'required': 'true', 'autocomplete': "off"})
+        self.fields['item_low_stock_alert'].widget.attrs.update({'class': 'textinput form-control setprice item_low_stock_alert', 'required': 'true', 'autocomplete': "off" })
+        self.fields['item_packaging_type'].widget.attrs.update({'class': 'form-select form-control setprice item_packaging_type', 'required': 'true', 'autocomplete': "off"})
+        self.fields['item_company'].widget.attrs.update({'class': 'textinput form-control setprice item_company', 'required': 'true', 'autocomplete': "off"})
 
     class Meta:
         model = Item
         fields = ['item_name', 'item_detail', 'item_low_stock_alert', 'item_packaging_type', "item_company"]
+
+class SupplierForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['supplier_name'].widget.attrs.update({'class': 'textinput form-control setprice supplier_name', 'required': 'true' , 'autocomplete': "off"})
+        self.fields['supplier_location'].widget.attrs.update({'class': 'textinput form-control setprice supplier_location', 'required': 'true' , 'autocomplete': "off"})
+        self.fields['supplier_gst'].widget.attrs.update({'class': 'textinput form-control setprice supplier_gst', 'autocomplete': "off"})
+        self.fields['supplier_dl'].widget.attrs.update({'class': 'textinput form-control setprice supplier_dl', 'autocomplete': "off"})
+    
+    class Meta:
+        model = SupplierModel
+        fields = ['supplier_name', 'supplier_location', 'supplier_gst', 'supplier_dl' ] 
+
+class ClientForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['client_name'].widget.attrs.update({'class': 'textinput form-control setprice client_name', 'required': 'true' , 'autocomplete': "off"})
+        self.fields['client_location'].widget.attrs.update({'class': 'textinput form-control setprice client_location', 'required': 'true' , 'autocomplete': "off"})
+        self.fields['client_gst'].widget.attrs.update({'class': 'textinput form-control setprice client_gst', 'autocomplete': "off"})
+        self.fields['client_dl'].widget.attrs.update({'class': 'textinput form-control setprice client_dl', 'autocomplete': "off"})
+    
+    class Meta:
+        model = ClientModel
+        fields = ['client_name', 'client_location', 'client_gst', 'client_dl' ] 
 
 class HSNCodeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -60,12 +84,12 @@ class SellBillForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['sell_date'].widget.attrs.update({'class': 'textinput form-control setprice sell_date', 'required': 'true'})
-        self.fields['supplier'].widget.attrs.update({'class': 'textinput form-control setprice supplier', 'required': 'true'})
+        self.fields['client'].widget.attrs.update({'class': 'textinput form-control setprice client', 'required': 'true'})
         self.fields['payment_status'].widget.attrs.update({'class': 'form-select form-control setprice payment_status', 'min': '0', 'required': 'true'})
 
     class Meta:
         model = SellBill
-        fields = ['sell_bill_pk', 'sell_date', 'supplier', 'payment_status']
+        fields = ['sell_bill_pk', 'sell_date', 'client', 'payment_status']
 
 
 class SellItemForm(forms.ModelForm):
@@ -83,3 +107,5 @@ class SellItemForm(forms.ModelForm):
         fields = ['item', 'hsncode', 'quantity', 'sprice']
 
 SellItemFormset = formset_factory(SellItemForm, extra=1)
+
+
